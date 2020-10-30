@@ -41,6 +41,7 @@ if __name__ == '__main__':
         data = input()
         if not data:
             break
+        # clean previous line and place cursor onto beginning of the line
         print('\033[A                             \033[A')
         send_message(user, data)
 
