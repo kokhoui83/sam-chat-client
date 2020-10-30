@@ -3,6 +3,7 @@ import time
 from datetime import datetime
 import json
 import requests
+import argparse
 
 event = threading.Event()
 
@@ -23,19 +24,24 @@ def poll_message(user):
 
 def send_message(user, message):
     response = requests.post('http://localhost:3000/chat', data=json.dumps({ 'user': user, 'message': message }))
-    print(response.text)
+    # print(response.text)
 
 if __name__ == '__main__':
-    user = input('username: ')
+    parser = argparse.ArgumentParser(description='sam chat client')
+    parser.add_argument('-u', '--user', help='user help', required=True)
+    args = parser.parse_args()
+
+    user = args.user
     print('welcome', user)
-    run = True
+
     th = threading.Thread(target=poll_message, args=(user,))
     th.start()
 
     while True:
-        data = input('> ')
+        data = input()
         if not data:
             break
+        print('\033[A                             \033[A')
         send_message(user, data)
 
     event.set()
