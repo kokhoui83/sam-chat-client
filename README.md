@@ -35,5 +35,16 @@ deactivate
 
 ## Running locally
 ```
-python app.py
+# usage
+python app.py --help
+usage: app.py [-h] -u USER
+
+sam chat client
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -u USER, --user USER  user help
+
+# example
+python app.py --user john
 ```
