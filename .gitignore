@@ -1,5 +1,8 @@
 # virtual env
 venv/
 
-#ide
+# ide
 .vscode/
+
+# testing
+.pytest_cache
