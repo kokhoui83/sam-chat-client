@@ -33,8 +33,7 @@ class Messenger:
         data = json.dumps({ 'user': self.user, 'message': message })
         try:
             response = requests.post(f'{self.url}/chat', data=data)
+            return json.loads(response.text)
         except Exception as e:
             print('faild to send message to server')
             pass
-
-        return True
