@@ -15,25 +15,37 @@ class Messenger:
 
             try:
                 response = requests.get(f'{self.url}/chat', params=params)
-                data = json.loads(response.text)
 
-                chats = data['chats']
-                self.lastupdate = data['lastupdate']
+                if response.status_code == 200:
+                    data = json.loads(response.text)
 
-                for chat in chats:
-                    print('%s %s: %s' %(datetime.fromtimestamp(chat['timestamp']).isoformat(), chat['user'], chat['message']))
-                
-                time.sleep(1)
+                    chats = data['chats']
+                    self.lastupdate = data['lastupdate']
+
+                    for chat in chats:
+                        print('%s %s: %s' %(datetime.fromtimestamp(chat['timestamp']).isoformat(), chat['user'], chat['message']))
+                elif response.status_code == 400:
+                    print(response.text)
+                else:
+                    print('server error')
+
             except Exception as e:
-                print('failed to poll message from server')
-                print(e)
+                print('failed to poll message from server', e)
                 pass
+            
+            time.sleep(1)
     
     def send_message(self, message):
         data = json.dumps({ 'user': self.user, 'message': message })
         try:
             response = requests.post(f'{self.url}/chat', data=data)
-            return json.loads(response.text)
+
+            if response.status_code == 201:
+                return json.loads(response.text)
+            elif response.status_code == 400:
+                print(response.text)
+            else:
+                print('server error')
         except Exception as e:
-            print('faild to send message to server')
+            print('faild to send message to server', e)
             pass
