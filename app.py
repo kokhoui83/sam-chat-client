@@ -1,40 +1,25 @@
-import threading
-import time
-from datetime import datetime
-import json
-import requests
 import argparse
-
-event = threading.Event()
-
-def poll_message(user):
-    lastupdate = 0
-
-    while not event.is_set():
-        response = requests.get('http://localhost:3000/chat', params={ 'user': user, 'lastupdate': lastupdate })
-        data = json.loads(response.text)
-        chats = data['chats']
-        lastupdate = data['lastupdate']
-
-        for chat in chats:
-            print('%s %s: %s' %(datetime.fromtimestamp(chat['timestamp']).isoformat(), chat['user'], chat['message']))
-        
-        time.sleep(1)
-
-
-def send_message(user, message):
-    response = requests.post('http://localhost:3000/chat', data=json.dumps({ 'user': user, 'message': message }))
-    # print(response.text)
+import threading
+from messenger import Messenger
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='sam chat client')
     parser.add_argument('-u', '--user', help='user help', required=True)
+    parser.add_argument('-s', '--server', help='server help', required=False)
+    
     args = parser.parse_args()
-
     user = args.user
+    
+    if not args.server == None:
+        server = args.server
+    else:
+        server = 'http://localhost:3000'
+    
     print('welcome', user)
 
-    th = threading.Thread(target=poll_message, args=(user,))
+    msgr = Messenger(server, user)
+    event = threading.Event()
+    th = threading.Thread(target=msgr.poll_message, args=(event,))
     th.start()
 
     while True:
@@ -43,7 +28,7 @@ if __name__ == '__main__':
             break
         # clean previous line and place cursor onto beginning of the line
         print('\033[A                             \033[A')
-        send_message(user, data)
+        msgr.send_message(data)
 
     event.set()
     th.join()

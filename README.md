@@ -48,3 +48,8 @@ optional arguments:
 # example
 python app.py --user john
 ```
+
+## Run tests
+```
+python -m pytest tests/ -v
+```
